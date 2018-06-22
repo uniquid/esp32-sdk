@@ -1,5 +1,8 @@
 .pioenvs
 .piolibdeps
-.vscode/.browse.c_cpp.db*
+.vscode
+memory.map
+extern/hw/yajl/
 .vscode/c_cpp_properties.json
 .vscode/launch.json
+.vscode/.browse.c_cpp.db*
