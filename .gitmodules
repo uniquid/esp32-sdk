@@ -1,0 +1,3 @@
+[submodule "extern/uidcore-c"]
+	path = extern/uidcore-c
+	url = https://github.com/uniquid/uidcore-c.git
