@@ -4,6 +4,8 @@
         "PLATFORMIO_CALLER": "vscode"
     },
     "files.associations": {
-        "esp_system.h": "c"
+        "esp_system.h": "c",
+        "time.h": "c",
+        "uid_dispatch.h": "c"
     }
 }

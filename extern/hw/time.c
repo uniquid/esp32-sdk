@@ -16,6 +16,7 @@
 #include <sys/time.h>
 #include <time.h>
 
+int clock_gettime(clockid_t __clock_id, struct timespec *__tp);
 
 int clock_gettime(clockid_t __clock_id, struct timespec *__tp)
 {
