@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "UID_bchainBTC.h"
 
+extern cache_buffer *current, *secondb;
+
 char *load_tprv(char *privateKey, size_t size)
 {
     privateKey = NULL;
@@ -19,5 +21,7 @@ void store_contracts(char * name, uint8_t *contracts, size_t size)
 }
 
 void load_contracts(cache_buffer ** cache){
-    
+    *cache = current;
+    (current->validCacheEntries)=0;
+    (current->validClientEntries)=0; 
 }

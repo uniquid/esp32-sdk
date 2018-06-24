@@ -28,6 +28,4 @@ typedef struct data_in {
     size_t len; //length of msg without '\0' like strlen(msg)
 } data_in_service;
 
-uint8_t *getMacAddress(int fake);
-
 #endif

@@ -19,7 +19,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
     mync = nc;
     (void) nc;
 
-    if (ev != MG_EV_POLL) printf("MQTT: USER HANDLER GOT EVENT %d", ev);
+    if (ev != MG_EV_POLL) printf("MQTT: USER HANDLER GOT EVENT %d\n", ev);
     switch (ev) {
         case MG_EV_CONNECT: {
             struct mg_send_mqtt_handshake_opts opts;
@@ -42,15 +42,15 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
         }
         case MG_EV_MQTT_CONNACK:
             if (msg->connack_ret_code != MG_EV_MQTT_CONNACK_ACCEPTED) {
-                printf("MQTT: Got mqtt connection error: %d", msg->connack_ret_code);
+                printf("MQTT: Got mqtt connection error: %d\n", msg->connack_ret_code);
                 exit(1);
             }
             s_topic_expr.topic = myname;
-            printf("MQTT: Subscribing to '%s'", myname);
+            printf("MQTT: Subscribing to '%s'\n", myname);
             mg_mqtt_subscribe(nc, &s_topic_expr, 1, 42);
             break;
         case MG_EV_MQTT_PUBACK:
-            printf("MQTT: Message publishing acknowledged (msg_id: %d)", msg->message_id);
+            printf("MQTT: Message publishing acknowledged (msg_id: %d)\n", msg->message_id);
             break;
         case MG_EV_MQTT_SUBACK:
             mg_mqtt_publish(nc, "UID/announce", 65, MG_MQTT_QOS(1), imprinting, strlen(imprinting));
@@ -63,12 +63,12 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
             mqtt_in.msg = mqtt_buffer;
             mqtt_in.type = 0;
             mqtt_in.len = (int) msg->payload.len;
-            printf("MQTT: %s:%d", mqtt_in.msg, mqtt_in.len);
+            printf("MQTT: %s:%d\n", mqtt_in.msg, mqtt_in.len);
             xQueueSend(provider_queue, (void *) &mqtt_in, portMAX_DELAY);
             break;
         }
         case MG_EV_CLOSE:{
-            printf("MQTT: Connection closed");
+            printf("MQTT: Connection closed\n");
             mg_mgr_free(&mgr);
             mqttFlag = false;
             break;
@@ -82,19 +82,20 @@ void mqtt_send(data_in_service* arg){
 
 void mqtt_reconnect(){
     xTimerStop(mqttReconnectTimer, 0);
+    printf("mqtt socket: closing...\n");
     mg_close_conn(mync);
 }
 
 static void mqtt(){
-    vTaskDelay(2500);
-    mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(5000), pdFALSE, (void*)0, mqtt_reconnect);
-    sprintf(s_address,"%s:%d",MQTT_HOST,MQTT_PORT);
+    vTaskDelay(2500 / portTICK_PERIOD_MS);
+    mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(15000), pdFALSE, (void*)0, mqtt_reconnect);
+    sprintf(s_address,"%s:%d\n", MQTT_HOST,MQTT_PORT);
     while(1){
         if(apFlag){
             mg_mgr_init(&mgr, NULL);
             if ((mync = mg_connect(&mgr, s_address, ev_handler)) == NULL) {
                 fprintf(stderr, "mg_connect(%s) failed\n", s_address);
-                vTaskDelay(5000);
+                vTaskDelay(5000 / portTICK_PERIOD_MS);
                 continue;
             } else mqttFlag = true;
         }
@@ -104,9 +105,9 @@ static void mqtt(){
                 mync = NULL;
                 break;
             }
-            vTaskDelay(1000);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
-        vTaskDelay(1000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 

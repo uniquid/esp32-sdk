@@ -45,6 +45,7 @@ void updater(void *arg)
 	while(1){
 		apFlagTemp=apFlag;
 		if(apFlagTemp){
+			printf("UID_getContracts\n");
 			ret = UID_getContracts(&cache);
 			if ( UID_CONTRACTS_OK == ret) {
 				bool cacheWrite = false;
@@ -57,8 +58,9 @@ void updater(void *arg)
 					}
 				}
 				if (cacheWrite){
-					store_contracts("/ccache.bin", (uint8_t *)(cache->contractsCache), sizeof(UID_SecurityProfile)*(cache->validCacheEntries));
+					//store_contracts("/ccache.bin", (uint8_t *)(cache->contractsCache), sizeof(UID_SecurityProfile)*(cache->validCacheEntries));
 					//store_contracts("/clicache.bin", (uint8_t *)(cache->clientCache), sizeof(UID_ClientProfile)*(cache->validClientEntries));
+					printf("Do cache write\n");
 				}
 				else{
 					printf("Skipping cache write\n");
@@ -70,14 +72,14 @@ void updater(void *arg)
 			}
 			// just print the cache contents
 			printCache(cache);
-			vTaskDelay(45000);
+			vTaskDelay(45000 / portTICK_PERIOD_MS);
 		} else {
-			vTaskDelay(10000);
+			vTaskDelay(10000 / portTICK_PERIOD_MS);
 		}
 	}
 }
 
-int main(void)
+void main(void *arg)
 {
 	uint16_t quotient = 0, remainder = 0, i = 0;
 	char slen[5] = {0};
@@ -86,13 +88,12 @@ int main(void)
 	// set up the URL to insight-api appliance
 	UID_pApplianceURL = "http://explorer.uniquid.co:3001/insight-api";
 	// set up the URL to the registry appliance
-	UID_pRegistryURL = "http://appliance4.uniquid.co:8080/registry";
+	UID_pRegistryURL = "http://159.65.27.147:8080/registry";
 	UID_getLocalIdentity(NULL);
 	load_contracts(&cache);
-	printCache(cache);
+	//printCache(cache);
 
-	uint8_t *mac = getMacAddress(0);
-	snprintf(myname, UID_NAME_LENGHT, "%s%02x%02x%02x%02x%02x%02x",NAME_PREFIX, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	snprintf(myname, UID_NAME_LENGHT, "%s%02X%02X%02X%02X%02X%02X", NAME_PREFIX, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF);
 	printf("Unique name %s\n", myname);
 
 	// build the imprinting string
@@ -104,13 +105,11 @@ int main(void)
 	// here we are using pthread, but is up to the user of the library
 	// to chose how to schedule the execution of UID_getContracts()
     xTaskCreatePinnedToCore(updater, "updater", 1024*8, NULL, 1, NULL, 1);
-	vTaskDelay(1000);
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	printf("---- Starting message loop\n");	
 	while(1){
-		//if(uxQueueMessagesWaiting(provider_queue)){
-			xQueueReceive(provider_queue, &main_in, portMAX_DELAY);
-			service_provider(&main_in);
-		//}
+		xQueueReceive(provider_queue, &main_in, portMAX_DELAY);
+		service_provider(&main_in);
 		printf("---- WaitMsg\n");
 	}
 }

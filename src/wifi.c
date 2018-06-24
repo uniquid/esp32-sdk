@@ -71,6 +71,6 @@ void start_wifi()
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
     printf("Wait for WiFi...\n");   
-    vTaskDelay(1000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     printf("Going on...\n");
 }

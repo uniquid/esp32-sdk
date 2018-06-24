@@ -2,6 +2,8 @@
 #include "esp_err.h"
 #include "global_var.h"
 
+extern void main(void*);
+
 void setup()
 {
     // Initialize NVS
@@ -16,16 +18,11 @@ void setup()
 
     start_wifi();
     start_mqtt();
-    main();
 }
 
 
 void app_main()
 {
     setup();
-    while(1){
-        // never reached
-        printf("## ERROR ##\nthis statement should never be reached!!\n");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
+    xTaskCreate(&main, "main_task", 4*2048, NULL, 1, NULL);
 }
