@@ -6,6 +6,7 @@
     "files.associations": {
         "esp_system.h": "c",
         "time.h": "c",
-        "uid_dispatch.h": "c"
+        "uid_dispatch.h": "c",
+        "yajl_tree.h": "c"
     }
 }

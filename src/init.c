@@ -3,9 +3,10 @@
 #include "UID_identity.h"
 #include "UID_utils.h"
 
+#include "global_var.h"
+
 #include <freertos/task.h>
 #include <freertos/ringbuf.h>
-char imprinting[500] = {0};
 
 extern cache_buffer *current, *secondb;
 
@@ -55,22 +56,17 @@ void updater(void *arg)
 						cacheWrite = true;
 					}
 				}
-				if (cacheWrite)
-				{
-					xSemaphoreTake(OBDaccess, portMAX_DELAY);
+				if (cacheWrite){
 					store_contracts("/ccache.bin", (uint8_t *)(cache->contractsCache), sizeof(UID_SecurityProfile)*(cache->validCacheEntries));
-					ResetOBD = true;
 					//store_contracts("/clicache.bin", (uint8_t *)(cache->clientCache), sizeof(UID_ClientProfile)*(cache->validClientEntries));
-					xSemaphoreGive(OBDaccess);
 				}
-				else
-				{
+				else{
 					printf("Skipping cache write\n");
 				}
 			}
-			else {
+			else{
 				// timeout o errori
-				ESP_LOGU("INIT", "UID_getContracts() return %d", ret);
+				printf("INIT: UID_getContracts() return %d", ret);
 			}
 			// just print the cache contents
 			printCache(cache);
@@ -91,16 +87,17 @@ int main(void)
 	UID_pApplianceURL = "http://explorer.uniquid.co:3001/insight-api";
 	// set up the URL to the registry appliance
 	UID_pRegistryURL = "http://appliance4.uniquid.co:8080/registry";
-	// generate or load the identity
-	//UID_getLocalIdentity("tprv8ZgxMBicQKsPdysK6szK4heHyavBL4FEfsWj3QAzgQqkJknpsMLksqLeui64sAugRs5YpN3cB8BYUVpjyaY72RgYst3xGB9i7Bt4UcMe9kh");
-	//UID_getLocalIdentity("tprv8ZgxMBicQKsPfBdbFwEiJBEmhwoN1QWgWBsAeaRf69P2J9shnJRqP6y173ADVFYvkUW9GLR3yWkY4mhSinxDyCXcYfz1bU7XDaJ8UfvACue");
 	UID_getLocalIdentity(NULL);
 	load_contracts(&cache);
 	printCache(cache);
 
+	uint8_t *mac = getMacAddress(0);
+	snprintf(myname, UID_NAME_LENGHT, "%s%02x%02x%02x%02x%02x%02x",NAME_PREFIX, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	printf("Unique name %s\n", myname);
+
 	// build the imprinting string
-	snprintf(imprinting, sizeof(imprinting), "{\"name\":\"%s\",\"xpub\":\"%s\"}", vin, UID_getTpub());
-	ESP_LOGU("INIT", "%s", imprinting);
+	snprintf(imprinting, imprinting_size, "{\"name\":\"%s\",\"xpub\":\"%s\"}", myname, UID_getTpub());
+	printf("INIT: %s", imprinting);
 
 	// start the the thread that updates the
 	// contracts cache from the block-chain

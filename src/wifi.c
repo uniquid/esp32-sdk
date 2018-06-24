@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "global_var.h"
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
@@ -36,7 +38,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED: //5
             printf("WIFI: lost connection\n");
-            //apFlag =  false;
+            apFlag =  false;
             xTimerStart(wifiReconnectTimer,0);
             break;
         case SYSTEM_EVENT_STA_AUTHMODE_CHANGE: //6
@@ -44,7 +46,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_GOT_IP: //7
             printf("WIFI: got ip:%s\n", ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
             printf("WIFI: got gateway ip:%s\n", ip4addr_ntoa(&event->event_info.got_ip.ip_info.gw));
-            //apFlag =  true;
+            apFlag =  true;
             break;
         default:
             break;

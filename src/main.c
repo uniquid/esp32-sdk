@@ -1,11 +1,13 @@
 #include "nvs_flash.h"
 #include "esp_err.h"
-#include "freertos/FreeRTOS.h"
+#include "global_var.h"
 
 void setup()
 {
     // Initialize NVS
     ESP_ERROR_CHECK( nvs_flash_init() );
+
+    provider_queue = xQueueCreate( 5, sizeof( data_in_service ) );
 
     printf("UNIQUID @ESP32-SDK\n");
     printf("******************************************************************************************\r\n");

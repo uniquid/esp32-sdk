@@ -1,4 +1,5 @@
 #include "mongoose.h"
+#include "global_var.h"
 
 char* mqtt_buffer;
 data_in_service mqtt_in;
@@ -18,7 +19,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
     mync = nc;
     (void) nc;
 
-    if (ev != MG_EV_POLL) ESP_LOGU("MQTT", "USER HANDLER GOT EVENT %d", ev);
+    if (ev != MG_EV_POLL) printf("MQTT: USER HANDLER GOT EVENT %d", ev);
     switch (ev) {
         case MG_EV_CONNECT: {
             struct mg_send_mqtt_handshake_opts opts;
@@ -28,7 +29,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
             opts.keep_alive = 60;
 
             mg_set_protocol_mqtt(nc);
-            mg_send_mqtt_handshake_opt(nc, vin, opts);
+            mg_send_mqtt_handshake_opt(nc, myname, opts);
             break;
         }
         case MG_EV_SEND:{
@@ -41,15 +42,15 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
         }
         case MG_EV_MQTT_CONNACK:
             if (msg->connack_ret_code != MG_EV_MQTT_CONNACK_ACCEPTED) {
-                ESP_LOGE("MQTT", "Got mqtt connection error: %d", msg->connack_ret_code);
+                printf("MQTT: Got mqtt connection error: %d", msg->connack_ret_code);
                 exit(1);
             }
-            s_topic_expr.topic = vin;
-            ESP_LOGU("MQTT", "Subscribing to '%s'", vin);
+            s_topic_expr.topic = myname;
+            printf("MQTT: Subscribing to '%s'", myname);
             mg_mqtt_subscribe(nc, &s_topic_expr, 1, 42);
             break;
         case MG_EV_MQTT_PUBACK:
-            ESP_LOGI("MQTT", "Message publishing acknowledged (msg_id: %d)", msg->message_id);
+            printf("MQTT: Message publishing acknowledged (msg_id: %d)", msg->message_id);
             break;
         case MG_EV_MQTT_SUBACK:
             mg_mqtt_publish(nc, "UID/announce", 65, MG_MQTT_QOS(1), imprinting, strlen(imprinting));
@@ -62,12 +63,12 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
             mqtt_in.msg = mqtt_buffer;
             mqtt_in.type = 0;
             mqtt_in.len = (int) msg->payload.len;
-            ESP_LOGU("MQTT", "%s:%d", mqtt_in.msg, mqtt_in.len);
+            printf("MQTT: %s:%d", mqtt_in.msg, mqtt_in.len);
             xQueueSend(provider_queue, (void *) &mqtt_in, portMAX_DELAY);
             break;
         }
         case MG_EV_CLOSE:{
-            ESP_LOGI("MQTT", "Connection closed");
+            printf("MQTT: Connection closed");
             mg_mgr_free(&mgr);
             mqttFlag = false;
             break;
