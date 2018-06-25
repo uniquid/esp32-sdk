@@ -8,6 +8,10 @@
 #include <freertos/task.h>
 #include <freertos/ringbuf.h>
 
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+
 extern cache_buffer *current, *secondb;
 
 void store_contracts(char* name, uint8_t * contracts, size_t size);
@@ -93,7 +97,48 @@ void main(void *arg)
 	load_contracts(&cache);
 	//printCache(cache);
 
-	snprintf(myname, UID_NAME_LENGHT, "%s%02X%02X%02X%02X%02X%02X", NAME_PREFIX, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF);
+	printf("Opening Non-Volatile Storage (NVS) handle... ");
+    nvs_handle my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) {
+        printf("Error (%d) opening NVS handle!\n", err);
+		esp_restart();
+    } else {
+        printf("Done\n");
+
+        // Read
+        printf("Reading restart counter from NVS ... ");
+        //err = nvs_get_i32(my_handle, "restart_counter", &restart_counter);
+		size_t name_lenght = 0;
+		err = nvs_get_str(my_handle, "myname", NULL, &name_lenght);
+		err = nvs_get_str(my_handle, "myname", myname, &name_lenght);
+		if(name_lenght>0)
+			printf("Unique name %s %d\n", myname, name_lenght);
+        switch (err) {
+            case ESP_OK:
+                printf("Done\n");
+                //printf("Restart counter = %d\n", restart_counter);
+                break;
+            case ESP_ERR_NVS_NOT_FOUND:
+                printf("The value is not initialized yet!\n");
+				snprintf(myname, UID_NAME_LENGHT, "%s%02X%02X%02X%02X%02X%02X", NAME_PREFIX, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF);
+                err = nvs_set_str(my_handle, "myname", myname);
+				break;
+            default :
+                printf("Error (%d) reading!\n", err);
+				snprintf(myname, UID_NAME_LENGHT, "%s%02X%02X%02X%02X%02X%02X", NAME_PREFIX, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF, esp_random()%0xFF);
+				err = nvs_set_str(my_handle, "myname", myname);
+				break;
+        }
+		printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+        
+		printf("Committing updates in NVS ... ");
+        err = nvs_commit(my_handle);
+        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+
+        nvs_close(my_handle);
+    }
+	
 	printf("Unique name %s\n", myname);
 
 	// build the imprinting string
