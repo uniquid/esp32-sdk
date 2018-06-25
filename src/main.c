@@ -7,6 +7,7 @@ extern void main(void*);
 void reader(void *arg)
 {
     char c;
+    int i = 0;
     while(1){
         c = getchar();
         if(c=='e'){
@@ -18,6 +19,9 @@ void reader(void *arg)
             esp_restart();
         }
         vTaskDelay(2000 / portTICK_PERIOD_MS);
+        i++;
+        if(i>10)
+            vTaskDelete( NULL ); 
     }
 }
 
@@ -45,6 +49,6 @@ void setup()
 void app_main()
 {
     setup();
-    xTaskCreate(&main, "main_task", 4*2048, NULL, 1, NULL);
+    xTaskCreate(&main, "main_task", 8*2048, NULL, 1, NULL);
     xTaskCreate(&reader, "reader", 1024, NULL, 1, NULL);
 }

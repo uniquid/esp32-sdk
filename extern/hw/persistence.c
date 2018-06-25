@@ -26,7 +26,7 @@ char *load_tprv(char *privateKey, size_t size)
 		err = nvs_get_str(my_handle, "privateKey", NULL, &lenght);
 		err = nvs_get_str(my_handle, "privateKey", privateKey, &lenght);
         if(lenght>0)
-		    printf("Unique name %s %d\n", privateKey, lenght);
+		    printf("Unique tprv %s %d\n", privateKey, lenght);
         switch (err) {
             case ESP_OK:
                 printf("Done\n");
@@ -70,7 +70,7 @@ void store_tprv(char *privateKey)
     return;
 }
 
-void store_contracts(char * name, uint8_t *contracts, size_t size)
+void store_contracts(char * name, uint8_t *contracts, size_t size, int entries)
 {
     printf("Opening Non-Volatile Storage (NVS) handle... ");
     nvs_handle my_handle;
@@ -81,7 +81,14 @@ void store_contracts(char * name, uint8_t *contracts, size_t size)
     } else {
         printf("Done\n");
 
-        err = nvs_set_blob(my_handle, "contracts", contracts, size);
+        err = nvs_set_blob(my_handle, name, contracts, size);
+        if(err == ESP_OK){
+            printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+            if(!strcmp(name,"/ccache.bin"))
+                err = nvs_set_i16(my_handle, "CacheEntries", entries);
+            else
+                err = nvs_set_i16(my_handle, "ClientEntries", entries);
+        }
         printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
         
         printf("Committing updates in NVS ... ");
@@ -110,8 +117,10 @@ void load_contracts(cache_buffer ** cache){
         // Read
         printf("Reading tprv from NVS ... ");
 		size_t lenght = 0;
-		err = nvs_get_blob(my_handle, "contracts", NULL, &lenght);
-		err = nvs_get_blob(my_handle, "contracts", current, &lenght);
+		err = nvs_get_blob(my_handle, "/ccache.bin", NULL, &lenght);
+		err = nvs_get_blob(my_handle, "/ccache.bin", current->contractsCache, &lenght);
+        err = nvs_get_i16(my_handle, "CacheEntries", &(current->validCacheEntries));
+        printf(">>>>>>>>>>> %d\n", current->validCacheEntries);
         switch (err) {
             case ESP_OK:
                 printf("Done\n");

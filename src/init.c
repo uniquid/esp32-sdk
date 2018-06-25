@@ -14,7 +14,7 @@
 
 extern cache_buffer *current, *secondb;
 
-void store_contracts(char* name, uint8_t * contracts, size_t size);
+void store_contracts(char* name, uint8_t * contracts, size_t size, int entries);
 void load_contracts(cache_buffer ** cache);
 void service_provider(data_in_service* arg);
 
@@ -62,7 +62,7 @@ void updater(void *arg)
 					}
 				}
 				if (cacheWrite){
-					store_contracts("", (uint8_t *)(cache), sizeof(cache_buffer));
+					store_contracts("/ccache.bin", (uint8_t *)(cache->contractsCache), sizeof(UID_SecurityProfile)*(cache->validCacheEntries), cache->validCacheEntries);
 					printf("Do cache write\n");
 				}
 				else{
