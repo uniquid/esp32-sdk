@@ -115,7 +115,7 @@ void load_contracts(cache_buffer ** cache){
         printf("Done\n");
 
         // Read
-        printf("Reading tprv from NVS ... ");
+        printf("Reading contracts from NVS ... ");
 		size_t lenght = 0;
 		err = nvs_get_blob(my_handle, "/ccache.bin", NULL, &lenght);
 		err = nvs_get_blob(my_handle, "/ccache.bin", current->contractsCache, &lenght);
