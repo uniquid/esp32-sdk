@@ -13,7 +13,7 @@ void reader(void *arg)
             printf("It's time to erase!\n");
             nvs_flash_erase();
         }
-        else if(c=='r'){}
+        else if(c=='r'){
             printf("It's time to restart!\n");
             esp_restart();
         }
@@ -38,8 +38,8 @@ void setup()
     printf("Genereting UNIQUID node\n");
     printf("******************************************************************************************\r\n");
 
-    //start_wifi();
-    //start_mqtt();
+    start_wifi();
+    start_mqtt();
 }
 
 void app_main()

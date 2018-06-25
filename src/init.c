@@ -62,8 +62,7 @@ void updater(void *arg)
 					}
 				}
 				if (cacheWrite){
-					//store_contracts("/ccache.bin", (uint8_t *)(cache->contractsCache), sizeof(UID_SecurityProfile)*(cache->validCacheEntries));
-					//store_contracts("/clicache.bin", (uint8_t *)(cache->clientCache), sizeof(UID_ClientProfile)*(cache->validClientEntries));
+					store_contracts("", (uint8_t *)(cache), sizeof(cache_buffer));
 					printf("Do cache write\n");
 				}
 				else{
@@ -95,7 +94,7 @@ void main(void *arg)
 	UID_pRegistryURL = "http://159.65.27.147:8080/registry";
 	UID_getLocalIdentity(NULL);
 	load_contracts(&cache);
-	//printCache(cache);
+	printCache(cache);
 
 	printf("Opening Non-Volatile Storage (NVS) handle... ");
     nvs_handle my_handle;

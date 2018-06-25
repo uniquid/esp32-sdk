@@ -72,11 +72,60 @@ void store_tprv(char *privateKey)
 
 void store_contracts(char * name, uint8_t *contracts, size_t size)
 {
+    printf("Opening Non-Volatile Storage (NVS) handle... ");
+    nvs_handle my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) {
+        printf("Error (%d) opening NVS handle!\n", err);
+        return;
+    } else {
+        printf("Done\n");
+
+        err = nvs_set_blob(my_handle, "contracts", contracts, size);
+        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+        
+        printf("Committing updates in NVS ... ");
+        err = nvs_commit(my_handle);
+        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+
+        nvs_close(my_handle);
+    }
     return;
 }
 
 void load_contracts(cache_buffer ** cache){
     *cache = current;
-    (current->validCacheEntries)=0;
-    (current->validClientEntries)=0; 
+    (current->validCacheEntries) = 0;
+    (current->validClientEntries) = 0; 
+
+    printf("Opening Non-Volatile Storage (NVS) handle... ");
+    nvs_handle my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) {
+        printf("Error (%d) opening NVS handle!\n", err);
+        return;
+    } else {
+        printf("Done\n");
+
+        // Read
+        printf("Reading tprv from NVS ... ");
+		size_t lenght = 0;
+		err = nvs_get_blob(my_handle, "contracts", NULL, &lenght);
+		err = nvs_get_blob(my_handle, "contracts", current, &lenght);
+        switch (err) {
+            case ESP_OK:
+                printf("Done\n");
+                break;
+            default :
+                break;
+        }
+        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+        
+        printf("Committing updates in NVS ... ");
+        err = nvs_commit(my_handle);
+        printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
+
+        nvs_close(my_handle);
+    }
+    return;
 }
