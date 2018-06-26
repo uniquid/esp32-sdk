@@ -21,27 +21,27 @@ data_in_service service_out, report_out;
 // example of usedefined method
 void user_32(char *param, char *result, size_t size)
 {
-	snprintf(result, size, "");
+	snprintf(result, size, param);
 }
 
 void user_33(char *param, char *result, size_t size)
 {
-	snprintf(result, size, "");
+	snprintf(result, size, param);
 }
 
 void user_34(char *param, char *result, size_t size)
 {
-	snprintf(result, size, "");
+	snprintf(result, size, param);
 }
 
 void user_35(char *param, char *result, size_t size)
 {
-	snprintf(result, size, "");
+	snprintf(result, size, param);
 }
 
 void user_36(char *param, char *result, size_t size)
 {
-	snprintf(result, size, "");
+	snprintf(result, size, param);
 }
 
 int perform_request(uint8_t *buffer, size_t size, uint8_t *response, size_t *rsize, UID_ServerChannelCtx *channel_ctx, int * err)
@@ -65,23 +65,23 @@ int perform_request(uint8_t *buffer, size_t size, uint8_t *response, size_t *rsi
 		else {
 			// user method.
 			switch(method) {
-				case 32:  //LOG
+				case 32:
 					user_32(params, result, sizeof(result));
 					error = 0;
 					break;
-				case 33:  //XXX
+				case 33:
 					user_33(params, result, sizeof(result));
 					error = 0;
 					break;
-				case 34:  //DOOR open/close/status
+				case 34:
 					user_34(params, result, sizeof(result));
 					error = 0;
 					break;
-				case 35: //TRUNK open/close/status
+				case 35:
 					user_35(params, result, sizeof(result));
 					error = 0;
 					break;
-				case 36: //XXX
+				case 36:
 					user_36(params, result, sizeof(result));
 					error = 0;
 					break;

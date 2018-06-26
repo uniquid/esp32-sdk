@@ -20,7 +20,7 @@ void reader(void *arg)
         }
         vTaskDelay(2000 / portTICK_PERIOD_MS);
         i++;
-        if(i>5)
+        if(i>TIMEOUT_READER)
             vTaskDelete( NULL ); 
     }
 }

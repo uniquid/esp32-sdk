@@ -91,7 +91,7 @@ void main(void *arg)
 	// set up the URL to insight-api appliance
 	UID_pApplianceURL = "http://explorer.uniquid.co:3001/insight-api";
 	// set up the URL to the registry appliance
-	UID_pRegistryURL = "http://159.65.27.147:8080/registry";
+	UID_pRegistryURL = REGISTRY_URL;
 	UID_getLocalIdentity(NULL);
 	load_contracts(&cache);
 	printCache(cache);
