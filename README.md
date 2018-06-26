@@ -29,7 +29,7 @@ there are some define in ``platformio.ini`` thant can/must be change.
 - ``-DNAME_PREFIX=\"ESP32_\"``: prefix of the name of the identity
 - ``-DMQTT_HOST=\"IP_MQTT\"``: mqtt broker host (MUST)
 - ``-DMQTT_PORT=1883``: mqtt port
-- ``-DREGISTRY_URL=\"http://xxx.xxx.xxx.xxx:xxxx/registry\"``: registry url with ip:port
+- ``-DREGISTRY_URL=\"http://xxx.xxx.xxx.xxx:xxxx/registry\"``: registry url with ip:port (MUST)
 - ``-DMY_SSID=\"SSID\"``: wifi ssid (MUST)
 - ``-DMY_PASSWORD=\"PASSWORD\"``: wifi password (MUST)
 - ``-DTIMEOUT_READER=5``: interaction timeout with the serial terminal from the system start, in seconds x2, if you enter 5, you have 10 seconds after starting to send commands.
