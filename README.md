@@ -51,6 +51,8 @@ if the user sends
 
 the provider (board) responds with
 - ``{"sender":"provider-address","body":{"result":"Hello World!","error":0,"id":65656} }``
+### capability
+Capability feature is available, but it is the responsibility of the user for how the capability message arrives and how to set the system time.
 
 ## info about porting
 - PlatformIO don't have a clean way to manage the include search path order. System paths are put always before the user ones. We used prebuild.py script to insert extern/hw/includeoverride before the system include search paths.
