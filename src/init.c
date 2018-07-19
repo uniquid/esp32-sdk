@@ -14,9 +14,12 @@
 
 extern cache_buffer *current, *secondb;
 
-void store_contracts(char* name, uint8_t * contracts, size_t size, int entries);
+void store_contracts(char* name, uint8_t * contracts, size_t size);//, int entries);
 void load_contracts(cache_buffer ** cache);
-void service_provider(data_in_service* arg);
+void service_provider(data_header* arg);
+void service_user(data_header* arg);
+
+int size = 0;
 
 void printCache(cache_buffer *cache)
 {
@@ -53,16 +56,16 @@ void updater(void *arg)
 			ret = UID_getContracts(&cache);
 			if ( UID_CONTRACTS_OK == ret) {
 				bool cacheWrite = false;
-				if (current->validCacheEntries != secondb->validCacheEntries){
+				if (current->validCacheEntries != secondb->validCacheEntries || current->validClientEntries != secondb->validClientEntries){
 					cacheWrite = true;
 				}
 				else {
-					if (memcmp(current->contractsCache, secondb->contractsCache, sizeof(UID_SecurityProfile)*(current->validCacheEntries))){
+					if (memcmp(current->contractsCache, secondb->contractsCache, sizeof(UID_SecurityProfile)*(current->validCacheEntries)) || memcmp(current->clientCache, secondb->clientCache, sizeof(UID_ClientProfile)*(current->validClientEntries))){
 						cacheWrite = true;
 					}
 				}
 				if (cacheWrite){
-					store_contracts("/ccache.bin", (uint8_t *)(cache->contractsCache), sizeof(UID_SecurityProfile)*(cache->validCacheEntries), cache->validCacheEntries);
+					store_contracts("/contracts.bin", (uint8_t *)cache, size);
 					printf("Do cache write\n");
 				}
 				else{
@@ -83,11 +86,12 @@ void updater(void *arg)
 }
 
 void main(void *arg)
-{
+{	
 	uint16_t quotient = 0, remainder = 0, i = 0;
 	char slen[5] = {0};
-	data_in_service main_in;
+	data_header main_in;
 	cache_buffer *cache;
+	size = sizeof(cache->clientCache)+sizeof(cache->contractsCache)+sizeof(cache->in_use)+sizeof(cache->validCacheEntries)+sizeof(cache->validClientEntries);
 	// set up the URL to insight-api appliance
 	UID_pApplianceURL = "http://explorer.uniquid.co:3001/insight-api";
 	// set up the URL to the registry appliance
@@ -150,6 +154,10 @@ void main(void *arg)
 	// to chose how to schedule the execution of UID_getContracts()
     xTaskCreatePinnedToCore(updater, "updater", 1024*8, NULL, 1, NULL, 1);
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+	xTaskCreatePinnedToCore(service_user, "service_user", 1024*8, NULL, 1, NULL, 1);
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
+
 	printf("---- Starting message loop\n");	
 	while(1){
 		xQueueReceive(provider_queue, &main_in, portMAX_DELAY);

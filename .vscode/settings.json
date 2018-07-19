@@ -1,12 +1,16 @@
 {
     "terminal.integrated.env.windows": {
-        "PATH": "C:\\Users\\sstef\\.platformio\\penv\\Scripts;C:\\Users\\sstef\\.platformio\\penv;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Git\\cmd;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\sstef\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\sstef\\AppData\\Roaming\\npm;C:\\Program Files\\Java\\jdk-10.0.1\\bin;C:\\Program Files\\apache-maven-3.5.3\\bin;;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Git\\cmd;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\sstef\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\sstef\\AppData\\Roaming\\npm;C:\\Program Files\\Java\\jdk-10.0.1\\bin;C:\\Program Files\\apache-maven-3.5.3\\bin;",
+        "PATH": "C:\\Users\\sstef\\.platformio\\penv\\Scripts;C:\\Users\\sstef\\.platformio\\penv;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Git\\cmd;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\sstef\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\sstef\\AppData\\Roaming\\npm;C:\\Program Files\\Java\\jdk-10.0.1\\bin;C:\\Program Files\\apache-maven-3.5.3\\bin;;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\Git\\cmd;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\sstef\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\sstef\\AppData\\Roaming\\npm;C:\\Program Files\\Java\\jdk-10.0.1\\bin;C:\\Program Files\\apache-maven-3.5.3\\bin;",
         "PLATFORMIO_CALLER": "vscode"
     },
     "files.associations": {
         "esp_system.h": "c",
         "time.h": "c",
         "uid_dispatch.h": "c",
-        "yajl_tree.h": "c"
+        "yajl_tree.h": "c",
+        "uid_capbac.h": "c",
+        "uid_fillcache.h": "c",
+        "uid_bchainbtc.h": "c",
+        "uid_identity.h": "c"
     }
 }

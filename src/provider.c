@@ -16,7 +16,7 @@
 
 #include "global_var.h"
 
-data_in_service service_out, report_out;
+data_header service_out, report_out;
 
 // example of usedefined method
 void user_32(char *param, char *result, size_t size)
@@ -184,7 +184,7 @@ uint8_t rbuffer[2048];
 /**
  * thread implementing a Service Provider
  */
-void service_provider(data_in_service* arg)
+void service_provider(data_header* arg)
 {
 	int ret, error = 0;
 

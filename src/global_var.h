@@ -21,11 +21,11 @@ extern char myname[];
 extern uint16_t myname_size;
 extern uint16_t imprinting_size;
 
-typedef struct data_in {
+typedef struct data {
     uint8_t type; // 0 from mqtt, 1 from ble
     char serviceUserAddress[BTC_ADDRESS_MAX_LENGHT];
     char * msg;
     size_t len; //length of msg without '\0' like strlen(msg)
-} data_in_service;
+} data_header;
 
 #endif

@@ -2,7 +2,7 @@
 #include "global_var.h"
 
 char* mqtt_buffer;
-data_in_service mqtt_in;
+data_header mqtt_in;
 
 extern void mg_close_conn();
 
@@ -76,7 +76,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
     }
 }
 
-void mqtt_send(data_in_service* arg){
+void mqtt_send(data_header* arg){
     mg_mqtt_publish(mync, arg->serviceUserAddress, 65, MG_MQTT_QOS(1), arg->msg, arg->len);
 }
 
