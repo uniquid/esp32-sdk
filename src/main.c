@@ -35,7 +35,8 @@ void setup()
     }
     ESP_ERROR_CHECK( err );
 
-    provider_queue = xQueueCreate( 5, sizeof( data_header ) );
+    provider_queue = xQueueCreate( 3, sizeof( data_header ) );
+    user_queue = xQueueCreate( 2, sizeof( data_header ) );
 
     printf("UNIQUID @ESP32-SDK\n");
     printf("******************************************************************************************\r\n");

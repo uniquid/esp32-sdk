@@ -14,7 +14,7 @@
 #include "esp_log.h"
 
 extern bool apFlag;
-extern QueueHandle_t provider_queue;
+extern QueueHandle_t provider_queue, user_queue;
 
 extern char imprinting[];
 extern char myname[];
@@ -23,7 +23,7 @@ extern uint16_t imprinting_size;
 
 typedef struct data {
     uint8_t type; // 0 from mqtt, 1 from ble
-    char serviceUserAddress[BTC_ADDRESS_MAX_LENGHT];
+    char destination[BTC_ADDRESS_MAX_LENGHT];
     char * msg;
     size_t len; //length of msg without '\0' like strlen(msg)
 } data_header;

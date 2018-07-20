@@ -217,7 +217,7 @@ void service_provider(data_header* arg)
 	service_out.type = arg->type;
 	if(service_out.type == 0){
 		service_out.len = rsize-1;
-		sprintf(service_out.serviceUserAddress, "%s", sctx.contract.serviceUserAddress);
+		sprintf(service_out.destination, "%s", sctx.contract.serviceUserAddress);
 		mqtt_send(&service_out);
 	}	
 	UID_closeServerChannel(&sctx);

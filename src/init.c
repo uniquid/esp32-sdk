@@ -17,7 +17,7 @@ extern cache_buffer *current, *secondb;
 void store_contracts(char* name, uint8_t * contracts, size_t size);//, int entries);
 void load_contracts(cache_buffer ** cache);
 void service_provider(data_header* arg);
-void service_user(data_header* arg);
+char * service_user(data_header* arg, int method);
 
 int size = 0;
 
@@ -49,6 +49,12 @@ void updater(void *arg)
 	cache_buffer *cache;
 	bool apFlagTemp = false;
 	int ret;
+
+//-----------------------------------------------------------
+	//USER ---> PROVIDER var
+	data_header uout;
+//-----------------------------------------------------------
+
 	while(1){
 		apFlagTemp=apFlag;
 		if(apFlagTemp){
@@ -60,7 +66,10 @@ void updater(void *arg)
 					cacheWrite = true;
 				}
 				else {
-					if (memcmp(current->contractsCache, secondb->contractsCache, sizeof(UID_SecurityProfile)*(current->validCacheEntries)) || memcmp(current->clientCache, secondb->clientCache, sizeof(UID_ClientProfile)*(current->validClientEntries))){
+					/*if (memcmp(current->contractsCache, secondb->contractsCache, sizeof(UID_SecurityProfile)*(current->validCacheEntries)) || memcmp(current->clientCache, secondb->clientCache, sizeof(UID_ClientProfile)*(current->validClientEntries))){
+						cacheWrite = true;
+					}*/
+					if (memcmp(current, secondb, size)){
 						cacheWrite = true;
 					}
 				}
@@ -73,11 +82,29 @@ void updater(void *arg)
 				}
 			}
 			else{
-				// timeout o errori
+				// timeout or errors
 				printf("INIT: UID_getContracts() return %d", ret);
 			}
 			// just print the cache contents
 			printCache(cache);
+
+//-----------------------------------------------------------
+
+			//USER ---> PROVIDER
+			memcpy(uout.destination,"JTankUT46SV09JV4E", strlen("JTankUT46SV09JV4E")); //provider name
+			uout.type = 0;
+			char * param = "Hello World!";
+			uout.msg = param;
+			uout.len = strlen(param);
+			char * data = NULL;
+			if((data=service_user(&uout, 31)) == NULL)
+				printf("ERROR\n");
+			else
+				printf("data from provider ---> %s\n", data);
+			free(data);
+
+//-----------------------------------------------------------
+
 			vTaskDelay(45000 / portTICK_PERIOD_MS);
 		} else {
 			vTaskDelay(10000 / portTICK_PERIOD_MS);
@@ -91,7 +118,7 @@ void main(void *arg)
 	char slen[5] = {0};
 	data_header main_in;
 	cache_buffer *cache;
-	size = sizeof(cache->clientCache)+sizeof(cache->contractsCache)+sizeof(cache->in_use)+sizeof(cache->validCacheEntries)+sizeof(cache->validClientEntries);
+	size = sizeof(cache->clientCache)+sizeof(cache->contractsCache)+sizeof(cache->validCacheEntries)+sizeof(cache->validClientEntries); //+sizeof(cache->in_use)
 	// set up the URL to insight-api appliance
 	UID_pApplianceURL = "http://explorer.uniquid.co:3001/insight-api";
 	// set up the URL to the registry appliance
@@ -153,9 +180,6 @@ void main(void *arg)
 	// here we are using pthread, but is up to the user of the library
 	// to chose how to schedule the execution of UID_getContracts()
     xTaskCreatePinnedToCore(updater, "updater", 1024*8, NULL, 1, NULL, 1);
-	vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-	xTaskCreatePinnedToCore(service_user, "service_user", 1024*8, NULL, 1, NULL, 1);
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
 	printf("---- Starting message loop\n");	

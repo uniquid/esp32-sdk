@@ -16,8 +16,6 @@
 
 #include "global_var.h"
 
-//da service_out, report_out;
-
 int MY_parse_result(uint8_t *buffer, size_t size, UID_ClientChannelCtx *ctx, char *res, size_t rsize, int64_t id)
 {
 	BTC_Address sender;
@@ -32,59 +30,53 @@ int MY_parse_result(uint8_t *buffer, size_t size, UID_ClientChannelCtx *ctx, cha
 	return 0;
 }
 
-
-void *service_user(void *arg)
+char * service_user(data_header* out, int method)
 {
-	int ret;
+	int ret = 0;
 
-	char machine[UID_NAME_LENGHT] = {0};
-	int method ;
-	char param[50] = {0};
-
-	while(1)
-	{
-		/*UID_ClientChannelCtx ctx;
-		if ( UID_MSG_OK != (ret = UID_createChannel(machine, &ctx)) ) {
-			error(0, 0, "UID_open_channel(%s) return %d\n", machine, ret);
-			continue;
-		}
-
-		uint8_t buffer[1024];
-		size_t size = sizeof(buffer);
-		int64_t id;
-		if ( UID_MSG_OK != (ret = UID_formatReqMsg(ctx.myid, method, param, buffer, &size, &id)) ) {
-			error(0, 0, "UID_format_request() return %d\n", ret);
-			continue;
-		}
-		DBG_Print("UID_format_request %s -- %d ret = %d\n",buffer,size, ret);
-
-		mqttUserSendMsg(machine, ctx.myid, buffer, size - 1);
-
-		uint8_t *msg;
-		DBG_Print("-->\n");
-		
-		
-		mqttUserWaitMsg(&msg, &size);
-		
-		
-		
-		DBG_Print("<--\n");
-
-		DBG_Print("--------->> %s\n", msg);
-
-		// client
-		char result[1024] = "";
-		if ( UID_MSG_OK != (ret = MY_parse_result(msg, size, &ctx, result, sizeof(result), id))) {
-			error(0, 0, "UID_parse_result() return %d\n", ret);
-			continue;
-		}
-		DBG_Print("UID_parse_result() %s\n", result);
-
-		free(msg);
-
-		UID_closeChannel(&ctx);*/
-		vTaskDelay(2000 / portTICK_PERIOD_MS);
+	UID_ClientChannelCtx ctx;
+	if ( UID_MSG_OK != (ret = UID_createChannel(out->destination, &ctx)) ) {
+		printf("UID_open_channel(%s) return %d\n", out->destination, ret);
+		return NULL;
 	}
 
-	return arg;
+	mqtt_subscribe(ctx.myid);
+
+	vTaskDelay(500 / portTICK_PERIOD_MS);
+
+	uint8_t buffer[1024];
+	size_t size = sizeof(buffer);
+	int64_t id;
+	if ( UID_MSG_OK != (ret = UID_formatReqMsg(ctx.myid, method, out->msg, buffer, &size, &id)) ) {
+		printf("UID_format_request() return %d\n", ret);
+		mqtt_unsubscribe(ctx.myid);
+		return NULL;
+	}
+	printf("UID_format_request %s -- %d ret = %d\n", buffer, size, ret);
+
+	out->msg = buffer;
+	if(out->type == 0){
+		out->len = strlen(buffer);
+		mqtt_send(out);
+	}
+
+	printf("---- WaitMsg\n");
+	data_header msg;
+	if(xQueueReceive(user_queue, &msg, (TickType_t )(15000/portTICK_PERIOD_MS)) == pdFALSE) //wait for 15s
+		return NULL;
+
+	// client
+	char * result = NULL;
+	result = (char*)malloc(sizeof(char)*1024);
+	memset(result, 0, 1024);
+	if ( UID_MSG_OK != (ret = MY_parse_result(msg.msg, msg.len, &ctx, result, 1024, id))) {
+		printf("UID_parse_result() return %d\n", ret);
+		mqtt_unsubscribe(ctx.myid);
+		free(result);
+		return NULL;
+	}
+	printf("UID_parse_result() %s\n", result);
+
+	UID_closeChannel(&ctx);
+	return result;
 }

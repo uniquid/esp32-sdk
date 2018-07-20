@@ -64,7 +64,9 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
             mqtt_in.type = 0;
             mqtt_in.len = (int) msg->payload.len;
             printf("MQTT: %s:%d\n", mqtt_in.msg, mqtt_in.len);
-            xQueueSend(provider_queue, (void *) &mqtt_in, portMAX_DELAY);
+            if(!strncmp(msg->topic.p, myname, msg->topic.len)) xQueueSend(provider_queue, (void *) &mqtt_in, portMAX_DELAY);
+            else xQueueSend(user_queue, (void *) &mqtt_in, portMAX_DELAY);
+
             break;
         }
         case MG_EV_CLOSE:{
@@ -76,8 +78,21 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
     }
 }
 
-void mqtt_send(data_header* arg){
-    mg_mqtt_publish(mync, arg->serviceUserAddress, 65, MG_MQTT_QOS(1), arg->msg, arg->len);
+void mqtt_unsubscribe(char * topic){
+    s_topic_expr.topic = topic;
+    printf("MQTT: Unsubscribing to '%s'\n", topic);
+    mg_mqtt_unsubscribe(mync, &s_topic_expr, 1, 42);
+}
+
+void mqtt_subscribe(char * topic){
+    s_topic_expr.topic = topic;
+    printf("MQTT: Subscribing to '%s'\n", topic);
+    mg_mqtt_subscribe(mync, &s_topic_expr, 1, 42);
+}
+
+void mqtt_send(data_header* out){
+    printf("MQTT %s -- %d ret = %s\n", out->msg, out->len, out->destination);
+    mg_mqtt_publish(mync, out->destination, 65, MG_MQTT_QOS(1), out->msg, out->len);
 }
 
 void mqtt_reconnect(){
